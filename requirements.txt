@@ -1,5 +1,7 @@
 numpy
+opencv-contrib-python
 pandas
+pillow
 pre-commit
 pytest
 scikit-learn
