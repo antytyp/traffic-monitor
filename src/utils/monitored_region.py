@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 
 
 @dataclass
@@ -9,7 +10,7 @@ class MonitoredRegion:
     width: int
     height: int
 
-    def get_pil_polygon_xy(self) -> list[tuple]:
+    def get_pil_polygon_xy(self) -> List[tuple]:
         p1 = (self.y, self.x)
         p2 = (self.y, self.x + self.height)
         p3 = (self.y + self.width, self.x + self.height)
