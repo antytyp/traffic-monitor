@@ -1,4 +1,5 @@
 numpy
 pandas
+pre-commit
 scikit-learn
 scipy
