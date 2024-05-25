@@ -1,5 +1,6 @@
 numpy
 pandas
 pre-commit
+pytest
 scikit-learn
 scipy
