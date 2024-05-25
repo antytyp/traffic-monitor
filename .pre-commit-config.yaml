@@ -24,7 +24,7 @@ repos:
   hooks:
     - id: mypy
       args: [
-        --config-file=config/mypy.ini
+        --config-file=mypy.ini
       ]
 
 - repo: local
