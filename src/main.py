@@ -1,8 +1,10 @@
 import json
 
+from src.data_setup.traffic_video_stream import TrafficVideoStream
 from src.utils.utils import get_monitored_regions
 
 DEFAULT_CONFIG_PATH = "../config/traffic_monitor_config.json"
+NUM_ITERATIONS = 10
 
 
 if __name__ == "__main__":
@@ -13,3 +15,8 @@ if __name__ == "__main__":
     region_configs = config.get("regions")
 
     monitored_regions = get_monitored_regions(region_configs)
+
+    traffic_video_stream = TrafficVideoStream(stream_url=stream_url)
+
+    for _ in range(NUM_ITERATIONS):
+        frame = traffic_video_stream.get_frame()
