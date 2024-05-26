@@ -1,5 +1,7 @@
 import json
 
+from src.utils.utils import get_monitored_regions
+
 DEFAULT_CONFIG_PATH = "../config/traffic_monitor_config.json"
 
 
@@ -9,3 +11,5 @@ if __name__ == "__main__":
 
     stream_url = config.get("url")
     region_configs = config.get("regions")
+
+    monitored_regions = get_monitored_regions(region_configs)
