@@ -3,6 +3,9 @@ import os
 
 from dotenv import load_dotenv
 
+from src.algorithms.statistical_traffic_monitor_model import (
+    StatisticalTrafficMonitorModel,
+)
 from src.data_setup.traffic_video_frame_preprocessor import (
     TrafficVideoFramePreprocessor,
 )
@@ -27,7 +30,9 @@ if __name__ == "__main__":
 
     traffic_video_stream = TrafficVideoStream(stream_url=camera_stream_url)
     frame_preprocessor = TrafficVideoFramePreprocessor(monitored_regions)
+    traffic_monitor_model = StatisticalTrafficMonitorModel(monitored_regions)
 
     for _ in range(NUM_ITERATIONS):
         frame = traffic_video_stream.get_frame()
         prepared_frame = frame_preprocessor.prepare(frame)
+        predictions = traffic_monitor_model.predict(prepared_frame)
