@@ -4,5 +4,6 @@ pandas
 pillow
 pre-commit
 pytest
+python-dotenv
 scikit-learn
 scipy
