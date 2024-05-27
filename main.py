@@ -15,7 +15,7 @@ from src.data_setup.traffic_video_frame_preprocessor import (
 from src.data_setup.traffic_video_stream import TrafficVideoStream
 from src.utils.utils import get_monitored_regions
 
-DEFAULT_CONFIG_PATH = "../config/traffic_monitor_config.json"
+DEFAULT_CONFIG_PATH = "config/traffic_monitor_config.json"
 NUM_ITERATIONS = 10
 
 
