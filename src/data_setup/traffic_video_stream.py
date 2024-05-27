@@ -4,7 +4,7 @@ import cv2
 
 
 class TrafficVideoStream:
-    def __init__(self, stream_url: str):
+    def __init__(self, stream_url: str | None):
         self.stream_url = stream_url
 
     def get_frame(self) -> cv2.typing.MatLike:
