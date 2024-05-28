@@ -16,7 +16,11 @@ from src.data_setup.traffic_video_stream import TrafficVideoStream
 from src.utils.utils import get_monitored_regions
 
 DEFAULT_CONFIG_PATH = "config/traffic_monitor_config.json"
+CAMERA_STREAM_URL_ENV = "CAMERA_STREAM_URL"
+REGIONS_CONFIG_KEY = "regions"
 NUM_ITERATIONS = 10
+NUM_TRAINING_FRAMES = 100
+FPS = 10
 
 
 if __name__ == "__main__":
@@ -26,8 +30,8 @@ if __name__ == "__main__":
     with open(DEFAULT_CONFIG_PATH) as f:
         config = json.load(f)
 
-    camera_stream_url = os.getenv("CAMERA_STREAM_URL")
-    region_configs = config.get("regions")
+    camera_stream_url = os.getenv(CAMERA_STREAM_URL_ENV)
+    region_configs = config.get(REGIONS_CONFIG_KEY)
 
     monitored_regions = get_monitored_regions(region_configs)
 
@@ -37,7 +41,7 @@ if __name__ == "__main__":
     frame_postprocessor = TrafficVideoFramePostprocessor(monitored_regions)
 
     training_frames = traffic_video_stream.get_frames(
-        num_frames=25, fps=10, verbose=True
+        num_frames=NUM_TRAINING_FRAMES, fps=FPS, verbose=True
     )
     print(f"Collected {len(training_frames)} frames.")
 
