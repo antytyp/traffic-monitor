@@ -23,7 +23,7 @@ def main() -> None:
     try:
         config = Config()
     except ConfigError as e:
-        print(f"ConfigError {e}.")
+        logger.error(e)
         return
 
     monitored_regions = get_monitored_regions(config.region_configs)
