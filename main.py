@@ -3,7 +3,7 @@ import os
 
 from dotenv import load_dotenv
 
-from src import constants
+from config import constants
 from src.algorithms.statistical_traffic_monitor_model import (
     StatisticalTrafficMonitorModel,
 )
@@ -17,14 +17,6 @@ from src.data_setup.traffic_video_stream import TrafficVideoStream
 from src.utils.utils import get_monitored_regions
 
 
-DEFAULT_CONFIG_PATH = "config/traffic_monitor_config.json"
-CAMERA_STREAM_URL_ENV = "CAMERA_STREAM_URL"
-REGIONS_CONFIG_KEY = "regions"
-NUM_ITERATIONS = 10
-NUM_TRAINING_FRAMES = 100
-FPS = 10
-
-
 def main() -> None:
     # Load environment variables from .env file
     load_dotenv()
@@ -32,8 +24,8 @@ def main() -> None:
     with open(constants.DEFAULT_CONFIG_PATH) as f:
         config = json.load(f)
 
-    camera_stream_url = os.getenv(CAMERA_STREAM_URL_ENV)
-    region_configs = config.get(REGIONS_CONFIG_KEY)
+    camera_stream_url = os.getenv(constants.CAMERA_STREAM_URL_ENV)
+    region_configs = config.get(constants.REGIONS_CONFIG_KEY)
 
     monitored_regions = get_monitored_regions(region_configs)
 
@@ -43,7 +35,7 @@ def main() -> None:
     frame_postprocessor = TrafficVideoFramePostprocessor(monitored_regions)
 
     training_frames = traffic_video_stream.get_frames(
-        num_frames=NUM_TRAINING_FRAMES, fps=FPS, verbose=True
+        num_frames=constants.NUM_TRAINING_FRAMES, fps=constants.FPS, verbose=True
     )
     print(f"Collected {len(training_frames)} frames.")
 
