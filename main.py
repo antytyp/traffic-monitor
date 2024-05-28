@@ -23,7 +23,7 @@ NUM_TRAINING_FRAMES = 100
 FPS = 10
 
 
-if __name__ == "__main__":
+def main() -> None:
     # Load environment variables from .env file
     load_dotenv()
 
@@ -47,8 +47,15 @@ if __name__ == "__main__":
 
     traffic_monitor_model.fit(training_frames)
 
+    frames_with_prediction = []
+
     for _ in range(NUM_ITERATIONS):
         frame = traffic_video_stream.get_single_frame()
         prepared_frame = frame_preprocessor.prepare(frame)
         predictions = traffic_monitor_model.predict(prepared_frame)
         frame_with_predictions = frame_postprocessor.prepare(frame, predictions)
+        frames_with_prediction.append(frame_with_predictions)
+
+
+if __name__ == "__main__":
+    main()
