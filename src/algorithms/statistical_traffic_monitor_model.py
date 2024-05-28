@@ -29,7 +29,26 @@ class StatisticalTrafficMonitorModel(TrafficMonitorModel):
             self.monitored_regions_backgrounds[monitored_region] = (
                 background_representation
             )
+        print("Model successfully trained")
 
-    def predict(self, frame_monitored_regions: List[np.ndarray]) -> np.ndarray:
-        # dummy prediction for now...
-        return np.random.randint(0, 2, len(frame_monitored_regions))
+    def predict(self, prepared_frames: List[np.ndarray]) -> np.ndarray:
+        prediction_mses = []
+
+        for prepared_frame, monitored_region in zip(
+            prepared_frames, self.monitored_regions
+        ):
+            monitored_region_background = self.monitored_regions_backgrounds[
+                monitored_region
+            ]
+
+            mse = ((prepared_frame - monitored_region_background) ** 2).mean()
+
+            prediction_mses.append(mse)
+
+        mse_threshold = 50.0
+
+        predictions = [1.0 if mse >= mse_threshold else 0.0 for mse in prediction_mses]
+
+        predictions = np.asarray(predictions)
+
+        return predictions
