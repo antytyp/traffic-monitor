@@ -1,9 +1,5 @@
-import json
-import os
-
-from dotenv import load_dotenv
-
 from config import constants
+from config.config import Config, ConfigError
 from src.algorithms.statistical_traffic_monitor_model import (
     StatisticalTrafficMonitorModel,
 )
@@ -18,18 +14,15 @@ from src.utils.utils import get_monitored_regions
 
 
 def main() -> None:
-    # Load environment variables from .env file
-    load_dotenv()
+    try:
+        config = Config()
+    except ConfigError as e:
+        print(f"ConfigError {e}.")
+        return
 
-    with open(constants.DEFAULT_CONFIG_PATH) as f:
-        config = json.load(f)
+    monitored_regions = get_monitored_regions(config.region_configs)
 
-    camera_stream_url = os.getenv(constants.CAMERA_STREAM_URL_ENV)
-    region_configs = config.get(constants.REGIONS_CONFIG_KEY)
-
-    monitored_regions = get_monitored_regions(region_configs)
-
-    traffic_video_stream = TrafficVideoStream(stream_url=camera_stream_url)
+    traffic_video_stream = TrafficVideoStream(stream_url=config.camera_stream_url)
     frame_preprocessor = TrafficVideoFramePreprocessor(monitored_regions)
     traffic_monitor_model = StatisticalTrafficMonitorModel(monitored_regions)
     frame_postprocessor = TrafficVideoFramePostprocessor(monitored_regions)
