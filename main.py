@@ -43,7 +43,7 @@ def main() -> None:
 
     frames_with_prediction = []
 
-    for _ in range(constants.NUM_ITERATIONS):
+    for _ in range(constants.NUM_PREDICT_ITERATIONS):
         frame = traffic_video_stream.get_single_frame()
         prepared_frame = frame_preprocessor.prepare(frame)
         predictions = traffic_monitor_model.predict(prepared_frame)
