@@ -36,7 +36,7 @@ def main() -> None:
     training_frames = traffic_video_stream.get_frames(
         num_frames=constants.NUM_TRAINING_FRAMES, fps=constants.FPS, verbose=True
     )
-    print(f"Collected {len(training_frames)} frames.")
+    logger.info(f"Collected {len(training_frames)} frames.")
 
     traffic_monitor_model.fit(training_frames)
 
