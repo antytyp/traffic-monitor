@@ -37,7 +37,7 @@ class Config:
             )
 
         self._region_configs = config.get(constants.REGIONS_CONFIG_KEY)
-        if not self.region_configs:
+        if not self._region_configs:
             raise ConfigError(
                 f"No regions specified in the configuration under key '{constants.REGIONS_CONFIG_KEY}'"
             )
