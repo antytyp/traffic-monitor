@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 
 import cv2
 import numpy as np
@@ -10,7 +10,7 @@ from ..utils.monitored_region import MonitoredRegion
 class StatisticalTrafficMonitorModel(TrafficMonitorModel):
     def __init__(self, monitored_regions: List[MonitoredRegion]) -> None:
         self.monitored_regions = monitored_regions
-        self.monitored_regions_backgrounds: dict[
+        self.monitored_regions_backgrounds: Dict[
             MonitoredRegion, cv2.typing.MatLike
         ] = {}
 
