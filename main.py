@@ -1,3 +1,5 @@
+import logging
+
 from config import constants
 from config.config import Config, ConfigError
 from src.algorithms.statistical_traffic_monitor_model import (
@@ -11,6 +13,10 @@ from src.data_setup.traffic_video_frame_preprocessor import (
 )
 from src.data_setup.traffic_video_stream import TrafficVideoStream
 from src.utils.utils import get_monitored_regions
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def main() -> None:
