@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, List
 
 import cv2
@@ -5,6 +6,10 @@ import numpy as np
 
 from .traffic_monitor_model import TrafficMonitorModel
 from ..utils.monitored_region import MonitoredRegion
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class StatisticalTrafficMonitorModel(TrafficMonitorModel):
@@ -29,7 +34,7 @@ class StatisticalTrafficMonitorModel(TrafficMonitorModel):
             self.monitored_regions_backgrounds[monitored_region] = (
                 background_representation
             )
-        print("Model successfully trained")
+        logger.info("Model successfully trained")
 
     def predict(self, prepared_frames: List[np.ndarray]) -> np.ndarray:
         prediction_mses = []
