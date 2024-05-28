@@ -36,6 +36,12 @@ if __name__ == "__main__":
     traffic_monitor_model = StatisticalTrafficMonitorModel(monitored_regions)
     frame_postprocessor = TrafficVideoFramePostprocessor(monitored_regions)
 
+    collected_frames = traffic_video_stream.get_frames(
+        num_frames=25, fps=10, verbose=True
+    )
+
+    print(f"Collected {len(collected_frames)} frames.")
+
     for _ in range(NUM_ITERATIONS):
         frame = traffic_video_stream.get_single_frame()
         prepared_frame = frame_preprocessor.prepare(frame)

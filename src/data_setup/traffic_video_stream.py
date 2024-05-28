@@ -1,5 +1,6 @@
 from datetime import datetime
-from typing import Union
+from time import time
+from typing import Union, List
 
 import cv2
 
@@ -26,3 +27,30 @@ class TrafficVideoStream:
         ret, frame = self.cv2_video_capture.read()
         self.release_connection()
         return frame
+
+    def get_frames(
+        self, num_frames: int, fps: int = 25, verbose: bool = False
+    ) -> List[cv2.typing.MatLike]:
+        frames: List[cv2.typing.MatLike] = []
+        self.open_connection()
+        prev_time = time()
+        try:
+            while len(frames) < num_frames:
+                ret, frame = self.cv2_video_capture.read()
+                read_time = time()
+                time_delta = read_time - prev_time
+                if time_delta > 1.0 / fps:
+                    frames.append(frame)
+                    prev_time = read_time
+                    if verbose:
+                        current_time = datetime.utcnow().strftime(
+                            "%Y-%m-%d %H:%M:%S.%f"
+                        )
+                        print(
+                            f"Frame collected, time {current_time}, time delta = {time_delta}"
+                        )
+        except KeyboardInterrupt:
+            print("Keyboard Interrupt!")
+        finally:
+            self.release_connection()
+        return frames
