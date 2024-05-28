@@ -1,8 +1,13 @@
+import logging
 from datetime import datetime
 from time import time
 from typing import Union, List
 
 import cv2
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class TrafficVideoStream:
@@ -12,13 +17,13 @@ class TrafficVideoStream:
 
     def open_connection(self) -> None:
         self.cv2_video_capture.open(self.stream_url)
-        print(
+        logger.info(
             f'VideoCapture connection opened at {datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")}.'
         )
 
     def release_connection(self) -> None:
         self.cv2_video_capture.release()
-        print(
+        logger.info(
             f'VideoCapture connection released at {datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")}.'
         )
 
@@ -46,11 +51,11 @@ class TrafficVideoStream:
                         current_time = datetime.utcnow().strftime(
                             "%Y-%m-%d %H:%M:%S.%f"
                         )
-                        print(
+                        logger.info(
                             f"Frame collected, time {current_time}, time delta = {time_delta}"
                         )
         except KeyboardInterrupt:
-            print("Keyboard Interrupt!")
+            logger.info("Keyboard Interrupt!")
         finally:
             self.release_connection()
         return frames

@@ -1,3 +1,5 @@
+import logging
+
 from config import constants
 from config.config import Config, ConfigError
 from src.algorithms.statistical_traffic_monitor_model import (
@@ -13,11 +15,15 @@ from src.data_setup.traffic_video_stream import TrafficVideoStream
 from src.utils.utils import get_monitored_regions
 
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
 def main() -> None:
     try:
         config = Config()
     except ConfigError as e:
-        print(f"ConfigError {e}.")
+        logger.error(e)
         return
 
     monitored_regions = get_monitored_regions(config.region_configs)
@@ -30,7 +36,7 @@ def main() -> None:
     training_frames = traffic_video_stream.get_frames(
         num_frames=constants.NUM_TRAINING_FRAMES, fps=constants.FPS, verbose=True
     )
-    print(f"Collected {len(training_frames)} frames.")
+    logger.info(f"Collected {len(training_frames)} frames.")
 
     traffic_monitor_model.fit(training_frames)
 
