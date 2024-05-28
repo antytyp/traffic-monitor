@@ -37,7 +37,7 @@ if __name__ == "__main__":
     frame_postprocessor = TrafficVideoFramePostprocessor(monitored_regions)
 
     for _ in range(NUM_ITERATIONS):
-        frame = traffic_video_stream.get_frame()
+        frame = traffic_video_stream.get_single_frame()
         prepared_frame = frame_preprocessor.prepare(frame)
         predictions = traffic_monitor_model.predict(prepared_frame)
         frame_with_predictions = frame_postprocessor.prepare(frame, predictions)

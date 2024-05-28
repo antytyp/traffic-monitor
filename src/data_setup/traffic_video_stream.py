@@ -21,7 +21,7 @@ class TrafficVideoStream:
             f'VideoCapture connection released at {datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")}.'
         )
 
-    def get_frame(self) -> cv2.typing.MatLike:
+    def get_single_frame(self) -> cv2.typing.MatLike:
         self.open_connection()
         ret, frame = self.cv2_video_capture.read()
         self.release_connection()
