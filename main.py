@@ -8,7 +8,7 @@ from config.config import Config, ConfigError
 from src.algorithms.statistical_traffic_monitor_model import (
     StatisticalTrafficMonitorModel,
 )
-from src.data_setup.traffic_video_frame_postprocessor import (
+from src.postprocessing.traffic_video_frame_postprocessor import (
     TrafficVideoFramePostprocessor,
 )
 from src.preprocessing.traffic_video_frame_preprocessor import (
