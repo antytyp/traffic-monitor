@@ -5,6 +5,7 @@ import cv2
 
 from config import constants
 from config.config import Config, ConfigError
+from src.inference_pipeline import InferencePipeline
 from src.prediction.statistical_traffic_monitor_model import (
     StatisticalTrafficMonitorModel,
 )
@@ -31,10 +32,17 @@ def main() -> None:
 
     monitored_regions = get_monitored_regions(config.region_configs)
 
-    traffic_video_stream = TrafficVideoStream(stream_url=config.camera_stream_url)
     frame_preprocessor = TrafficVideoFramePreprocessor(monitored_regions)
     traffic_monitor_model = StatisticalTrafficMonitorModel(monitored_regions)
     frame_postprocessor = TrafficVideoFramePostprocessor(monitored_regions)
+
+    inference_pipeline = InferencePipeline(
+        preprocessor=frame_preprocessor,
+        predictor=traffic_monitor_model,
+        postprocessor=frame_postprocessor,
+    )
+
+    traffic_video_stream = TrafficVideoStream(stream_url=config.camera_stream_url)
 
     training_frames = traffic_video_stream.get_frames(
         num_frames=constants.NUM_TRAINING_FRAMES, fps=constants.FPS, verbose=True
@@ -53,9 +61,7 @@ def main() -> None:
             read_time = time()
             time_delta = read_time - prev_time
             if time_delta > 1.0 / stream_fps:
-                prepared_frame = frame_preprocessor.prepare(frame)
-                predictions = traffic_monitor_model.predict(prepared_frame)
-                frame_with_predictions = frame_postprocessor.prepare(frame, predictions)
+                frame_with_predictions = inference_pipeline.process_data(raw_data=frame)
 
                 cv2.imshow("live cam", frame_with_predictions)
                 if cv2.waitKey(50) & 0xFF == ord("q"):
