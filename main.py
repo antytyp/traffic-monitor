@@ -11,7 +11,7 @@ from src.algorithms.statistical_traffic_monitor_model import (
 from src.data_setup.traffic_video_frame_postprocessor import (
     TrafficVideoFramePostprocessor,
 )
-from src.data_setup.traffic_video_frame_preprocessor import (
+from src.preprocessing.traffic_video_frame_preprocessor import (
     TrafficVideoFramePreprocessor,
 )
 from src.data_setup.traffic_video_stream import TrafficVideoStream
