@@ -2,10 +2,11 @@ from typing import List
 
 import numpy as np
 
+from src.preprocessing.preprocessor import Preprocessor
 from src.utils.monitored_region import MonitoredRegion
 
 
-class TrafficVideoFramePreprocessor:
+class TrafficVideoFramePreprocessor(Preprocessor):
     def __init__(self, monitored_regions: List[MonitoredRegion]):
         self.monitored_regions = monitored_regions
 
