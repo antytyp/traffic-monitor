@@ -5,7 +5,7 @@ import cv2
 
 from config import constants
 from config.config import Config, ConfigError
-from src.algorithms.statistical_traffic_monitor_model import (
+from src.prediction.statistical_traffic_monitor_model import (
     StatisticalTrafficMonitorModel,
 )
 from src.postprocessing.traffic_video_frame_postprocessor import (
