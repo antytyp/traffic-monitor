@@ -23,6 +23,35 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+def show_live_stream_with_prediction(
+    traffic_video_stream: TrafficVideoStream, inference_pipeline: InferencePipeline
+) -> None:
+    traffic_video_stream.open_connection()
+    prev_time = time()
+    num_collected_frames = 0
+    stream_fps = 10
+    try:
+        while num_collected_frames < 250:
+            ret, frame = traffic_video_stream.cv2_video_capture.read()
+            read_time = time()
+            time_delta = read_time - prev_time
+            if time_delta > 1.0 / stream_fps:
+                frame_with_predictions = inference_pipeline.process_data(raw_data=frame)
+
+                cv2.imshow("live cam", frame_with_predictions)
+                if cv2.waitKey(50) & 0xFF == ord("q"):
+                    break
+
+                num_collected_frames += 1
+                prev_time = read_time
+
+    except KeyboardInterrupt:
+        logger.info("Keyboard Interrupt!")
+    finally:
+        traffic_video_stream.release_connection()
+        cv2.destroyAllWindows()
+
+
 def main() -> None:
     try:
         config = Config()
@@ -51,30 +80,7 @@ def main() -> None:
 
     traffic_monitor_model.fit(training_frames)
 
-    traffic_video_stream.open_connection()
-    prev_time = time()
-    num_collected_frames = 0
-    stream_fps = 10
-    try:
-        while num_collected_frames < 250:
-            ret, frame = traffic_video_stream.cv2_video_capture.read()
-            read_time = time()
-            time_delta = read_time - prev_time
-            if time_delta > 1.0 / stream_fps:
-                frame_with_predictions = inference_pipeline.process_data(raw_data=frame)
-
-                cv2.imshow("live cam", frame_with_predictions)
-                if cv2.waitKey(50) & 0xFF == ord("q"):
-                    break
-
-                num_collected_frames += 1
-                prev_time = read_time
-
-    except KeyboardInterrupt:
-        logger.info("Keyboard Interrupt!")
-    finally:
-        traffic_video_stream.release_connection()
-        cv2.destroyAllWindows()
+    show_live_stream_with_prediction(traffic_video_stream, inference_pipeline)
 
 
 if __name__ == "__main__":
