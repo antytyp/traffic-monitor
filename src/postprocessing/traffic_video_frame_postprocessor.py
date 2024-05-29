@@ -4,10 +4,11 @@ import cv2
 import numpy as np
 from PIL import Image, ImageDraw
 
+from src.postprocessing.postprocessor import Postprocessor
 from src.utils.monitored_region import MonitoredRegion
 
 
-class TrafficVideoFramePostprocessor:
+class TrafficVideoFramePostprocessor(Postprocessor):
     def __init__(self, monitored_regions: List[MonitoredRegion]) -> None:
         self.monitored_regions = monitored_regions
         self.object_detected_color = (154, 205, 50, 75)
