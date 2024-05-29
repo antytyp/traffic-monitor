@@ -1,4 +1,7 @@
 import logging
+from time import time
+
+import cv2
 
 from config import constants
 from config.config import Config, ConfigError
@@ -40,14 +43,32 @@ def main() -> None:
 
     traffic_monitor_model.fit(training_frames)
 
-    frames_with_prediction = []
+    traffic_video_stream.open_connection()
+    prev_time = time()
+    num_collected_frames = 0
+    stream_fps = 10
+    try:
+        while num_collected_frames < 250:
+            ret, frame = traffic_video_stream.cv2_video_capture.read()
+            read_time = time()
+            time_delta = read_time - prev_time
+            if time_delta > 1.0 / stream_fps:
+                prepared_frame = frame_preprocessor.prepare(frame)
+                predictions = traffic_monitor_model.predict(prepared_frame)
+                frame_with_predictions = frame_postprocessor.prepare(frame, predictions)
 
-    for _ in range(constants.NUM_PREDICT_ITERATIONS):
-        frame = traffic_video_stream.get_single_frame()
-        prepared_frame = frame_preprocessor.prepare(frame)
-        predictions = traffic_monitor_model.predict(prepared_frame)
-        frame_with_predictions = frame_postprocessor.prepare(frame, predictions)
-        frames_with_prediction.append(frame_with_predictions)
+                cv2.imshow("live cam", frame_with_predictions)
+                if cv2.waitKey(50) & 0xFF == ord("q"):
+                    break
+
+                num_collected_frames += 1
+                prev_time = read_time
+
+    except KeyboardInterrupt:
+        logger.info("Keyboard Interrupt!")
+    finally:
+        traffic_video_stream.release_connection()
+        cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
