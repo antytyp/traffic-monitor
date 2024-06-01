@@ -29,13 +29,14 @@ def show_live_stream_with_prediction(
     traffic_video_stream.open_connection()
     prev_time = time()
     num_collected_frames = 0
-    stream_fps = 10
+    stream_fps = constants.FPS
+    frame_interval_in_seconds = 1.0 / stream_fps
     try:
         while num_collected_frames < constants.MAX_NUM_FRAMES_LIVE_PREDICTION:
             ret, frame = traffic_video_stream.cv2_video_capture.read()
             read_time = time()
             time_delta = read_time - prev_time
-            if time_delta > 1.0 / stream_fps:
+            if time_delta > frame_interval_in_seconds:
                 frame_with_predictions = inference_pipeline.process_data(raw_data=frame)
 
                 cv2.imshow(constants.CV2_WINDOW_NAME, frame_with_predictions)
