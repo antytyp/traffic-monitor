@@ -31,7 +31,7 @@ def show_live_stream_with_prediction(
     num_collected_frames = 0
     stream_fps = 10
     try:
-        while num_collected_frames < 250:
+        while num_collected_frames < constants.MAX_NUM_FRAMES_LIVE_PREDICTION:
             ret, frame = traffic_video_stream.cv2_video_capture.read()
             read_time = time()
             time_delta = read_time - prev_time
