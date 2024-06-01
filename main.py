@@ -1,14 +1,18 @@
 import logging
+from time import time
+
+import cv2
 
 from config import constants
 from config.config import Config, ConfigError
-from src.algorithms.statistical_traffic_monitor_model import (
+from src.inference_pipeline import InferencePipeline
+from src.prediction.statistical_traffic_monitor_model import (
     StatisticalTrafficMonitorModel,
 )
-from src.data_setup.traffic_video_frame_postprocessor import (
+from src.postprocessing.traffic_video_frame_postprocessor import (
     TrafficVideoFramePostprocessor,
 )
-from src.data_setup.traffic_video_frame_preprocessor import (
+from src.preprocessing.traffic_video_frame_preprocessor import (
     TrafficVideoFramePreprocessor,
 )
 from src.data_setup.traffic_video_stream import TrafficVideoStream
@@ -17,6 +21,36 @@ from src.utils.utils import get_monitored_regions
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+def show_live_stream_with_prediction(
+    traffic_video_stream: TrafficVideoStream, inference_pipeline: InferencePipeline
+) -> None:
+    traffic_video_stream.open_connection()
+    prev_time = time()
+    num_collected_frames = 0
+    stream_fps = constants.FPS
+    frame_interval_in_seconds = 1.0 / stream_fps
+    try:
+        while num_collected_frames < constants.MAX_NUM_FRAMES_LIVE_PREDICTION:
+            ret, frame = traffic_video_stream.cv2_video_capture.read()
+            read_time = time()
+            time_delta = read_time - prev_time
+            if time_delta > frame_interval_in_seconds:
+                frame_with_predictions = inference_pipeline.process_data(raw_data=frame)
+
+                cv2.imshow(constants.CV2_WINDOW_NAME, frame_with_predictions)
+                if cv2.waitKey(50) & 0xFF == ord("q"):
+                    break
+
+                num_collected_frames += 1
+                prev_time = read_time
+
+    except KeyboardInterrupt:
+        logger.info("Keyboard Interrupt!")
+    finally:
+        traffic_video_stream.release_connection()
+        cv2.destroyAllWindows()
 
 
 def main() -> None:
@@ -28,10 +62,17 @@ def main() -> None:
 
     monitored_regions = get_monitored_regions(config.region_configs)
 
-    traffic_video_stream = TrafficVideoStream(stream_url=config.camera_stream_url)
     frame_preprocessor = TrafficVideoFramePreprocessor(monitored_regions)
     traffic_monitor_model = StatisticalTrafficMonitorModel(monitored_regions)
     frame_postprocessor = TrafficVideoFramePostprocessor(monitored_regions)
+
+    inference_pipeline = InferencePipeline(
+        preprocessor=frame_preprocessor,
+        predictor=traffic_monitor_model,
+        postprocessor=frame_postprocessor,
+    )
+
+    traffic_video_stream = TrafficVideoStream(stream_url=config.camera_stream_url)
 
     training_frames = traffic_video_stream.get_frames(
         num_frames=constants.NUM_TRAINING_FRAMES, fps=constants.FPS, verbose=True
@@ -40,14 +81,7 @@ def main() -> None:
 
     traffic_monitor_model.fit(training_frames)
 
-    frames_with_prediction = []
-
-    for _ in range(constants.NUM_PREDICT_ITERATIONS):
-        frame = traffic_video_stream.get_single_frame()
-        prepared_frame = frame_preprocessor.prepare(frame)
-        predictions = traffic_monitor_model.predict(prepared_frame)
-        frame_with_predictions = frame_postprocessor.prepare(frame, predictions)
-        frames_with_prediction.append(frame_with_predictions)
+    show_live_stream_with_prediction(traffic_video_stream, inference_pipeline)
 
 
 if __name__ == "__main__":
