@@ -38,7 +38,7 @@ def show_live_stream_with_prediction(
             if time_delta > 1.0 / stream_fps:
                 frame_with_predictions = inference_pipeline.process_data(raw_data=frame)
 
-                cv2.imshow("live cam", frame_with_predictions)
+                cv2.imshow(constants.CV2_WINDOW_NAME, frame_with_predictions)
                 if cv2.waitKey(50) & 0xFF == ord("q"):
                     break
 
