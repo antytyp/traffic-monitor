@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Union
 
 import cv2
 import numpy as np
@@ -18,13 +18,11 @@ class TrafficVideoStream:
         self.stream_url = stream_url
         self.base_url = self.stream_url.rstrip(self.stream_url.split("/")[-1])
 
-    def download_video_batch(self) -> List[np.ndarray]:
-        frames: List[np.ndarray] = []
-
+    def fetch_video_bytes(self) -> Union[bytes, None]:
         response = requests.get(self.stream_url)
 
         if response.status_code != 200:
-            return frames
+            return None
 
         m3u8_url_suffix = [
             key for key in response.text.split("\n") if key.endswith(".m3u8")
@@ -34,7 +32,7 @@ class TrafficVideoStream:
         response = requests.get(m3u8_url)
 
         if response.status_code != 200:
-            return frames
+            return None
 
         latest_ts_file_suffix = max(
             [key for key in response.text.split("\n") if key.endswith(".ts")]
@@ -44,10 +42,17 @@ class TrafficVideoStream:
         response = requests.get(latest_ts_url)
 
         if response.status_code != 200:
-            return frames
+            return None
+
+        return response.content
+
+    def download_video_batch(self) -> List[np.ndarray]:
+        frames: List[np.ndarray] = []
+
+        video_bytes = self.fetch_video_bytes()
 
         with open(TEMP_TS_PATH, "wb+") as f:
-            f.write(response.content)
+            f.write(video_bytes)  # type: ignore
 
         cv2_video_capture = cv2.VideoCapture()
         cv2_video_capture.open(TEMP_TS_PATH)
