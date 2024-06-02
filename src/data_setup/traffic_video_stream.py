@@ -32,7 +32,7 @@ class TrafficVideoStream:
 
         return m3u8_url
 
-    def _fetch_video_bytes(self) -> Union[bytes, None]:
+    def _get_latest_ts_url(self) -> Union[str, None]:
         m3u8_url = self._get_m3u8_url()
 
         response = requests.get(m3u8_url)
@@ -44,6 +44,11 @@ class TrafficVideoStream:
             [key for key in response.text.split("\n") if key.endswith(".ts")]
         )
         latest_ts_url = self.base_url + latest_ts_file_suffix
+
+        return latest_ts_url
+
+    def _fetch_video_bytes(self) -> Union[bytes, None]:
+        latest_ts_url = self._get_latest_ts_url()
 
         response = requests.get(latest_ts_url)
 
