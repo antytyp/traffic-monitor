@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import List, Union
 
 import cv2
@@ -76,9 +77,19 @@ class TrafficVideoStream:
 
         return frames
 
+    def _remove_temp_ts_file(self) -> None:
+        try:
+            os.remove(self.TEMP_TS_PATH)
+            logger.info(f"File '{self.TEMP_TS_PATH}' removed successfully.")
+        except OSError as e:
+            logger.error(
+                f"Error: Unable to remove file '{self.TEMP_TS_PATH}'. Reason: {e}"
+            )
+
     def download_video_batch(self) -> List[np.ndarray]:
         video_bytes = self._fetch_latest_ts_file()
         self._save_video_to_temp_ts_file(video_bytes)  # type: ignore
         frames = self._get_frames_from_temp_ts_file()
+        self._remove_temp_ts_file()
 
         return frames
