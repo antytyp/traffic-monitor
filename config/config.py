@@ -1,6 +1,6 @@
 import json
 import os
-from typing import List, Union
+from typing import List
 
 from dotenv import load_dotenv
 
@@ -43,9 +43,9 @@ class Config:
             )
 
     @property
-    def camera_stream_url(self) -> Union[str, None]:
+    def camera_stream_url(self) -> str:
         """Get the camera stream URL."""
-        return self._camera_stream_url
+        return self._camera_stream_url  # type: ignore
 
     @property
     def region_configs(self) -> List[dict]:
