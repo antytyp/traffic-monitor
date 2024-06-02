@@ -21,17 +21,22 @@ class TrafficVideoStream:
         self.base_url = self.stream_url.rstrip(self.stream_url.split("/")[-1])
 
     def _get_m3u8_url(self) -> Union[str, None]:
-        response = requests.get(self.stream_url)
+        try:
+            response = requests.get(self.stream_url)
+            response.raise_for_status()
 
-        if response.status_code != 200:
+            m3u8_url_suffix = next(
+                (key for key in response.text.split("\n") if key.endswith(".m3u8")),
+                None,
+            )
+            if m3u8_url_suffix is None:
+                return None
+
+            m3u8_url = self.base_url + m3u8_url_suffix
+            return m3u8_url
+        except requests.RequestException as e:
+            print(f"Error: Unable to fetch .m3u8 URL. Reason: {e}")
             return None
-
-        m3u8_url_suffix = [
-            key for key in response.text.split("\n") if key.endswith(".m3u8")
-        ][0]
-        m3u8_url = self.base_url + m3u8_url_suffix
-
-        return m3u8_url
 
     def _get_latest_ts_url(self) -> Union[str, None]:
         m3u8_url = self._get_m3u8_url()
