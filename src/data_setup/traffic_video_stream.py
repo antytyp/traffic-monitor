@@ -18,7 +18,7 @@ class TrafficVideoStream:
         self.stream_url = stream_url
         self.base_url = self.stream_url.rstrip(self.stream_url.split("/")[-1])
 
-    def fetch_video_bytes(self) -> Union[bytes, None]:
+    def _fetch_video_bytes(self) -> Union[bytes, None]:
         response = requests.get(self.stream_url)
 
         if response.status_code != 200:
@@ -49,7 +49,7 @@ class TrafficVideoStream:
     def download_video_batch(self) -> List[np.ndarray]:
         frames: List[np.ndarray] = []
 
-        video_bytes = self.fetch_video_bytes()
+        video_bytes = self._fetch_video_bytes()
 
         with open(TEMP_TS_PATH, "wb+") as f:
             f.write(video_bytes)  # type: ignore
