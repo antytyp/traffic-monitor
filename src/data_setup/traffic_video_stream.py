@@ -47,7 +47,7 @@ class TrafficVideoStream:
 
         return latest_ts_url
 
-    def _fetch_video_bytes(self) -> Union[bytes, None]:
+    def _fetch_latest_ts_file(self) -> Union[bytes, None]:
         latest_ts_url = self._get_latest_ts_url()
 
         response = requests.get(latest_ts_url)
@@ -77,7 +77,7 @@ class TrafficVideoStream:
         return frames
 
     def download_video_batch(self) -> List[np.ndarray]:
-        video_bytes = self._fetch_video_bytes()
+        video_bytes = self._fetch_latest_ts_file()
         self._save_video_to_temp_ts_file(video_bytes)  # type: ignore
         frames = self._get_frames_from_temp_ts_file()
 
