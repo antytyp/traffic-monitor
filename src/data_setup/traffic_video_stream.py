@@ -39,19 +39,22 @@ class TrafficVideoStream:
             return None
 
     def _get_latest_ts_url(self) -> Union[str, None]:
-        m3u8_url = self._get_m3u8_url()
+        try:
+            m3u8_url = self._get_m3u8_url()
+            response = requests.get(m3u8_url)
+            response.raise_for_status()
 
-        response = requests.get(m3u8_url)
+            ts_files = [key for key in response.text.split("\n") if key.endswith(".ts")]
+            if not ts_files:
+                return None
 
-        if response.status_code != 200:
+            latest_ts_file_suffix = max(ts_files)
+            latest_ts_url = self.base_url + latest_ts_file_suffix
+
+            return latest_ts_url
+        except requests.RequestException as e:
+            print(f"Error: Unable to fetch latest .ts URL. Reason: {e}")
             return None
-
-        latest_ts_file_suffix = max(
-            [key for key in response.text.split("\n") if key.endswith(".ts")]
-        )
-        latest_ts_url = self.base_url + latest_ts_file_suffix
-
-        return latest_ts_url
 
     def _fetch_latest_ts_file(self) -> Union[bytes, None]:
         try:
