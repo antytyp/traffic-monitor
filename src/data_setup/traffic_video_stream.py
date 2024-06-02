@@ -96,8 +96,8 @@ class TrafficVideoStream:
             )
 
     def download_video_batch(self) -> List[np.ndarray]:
-        video_bytes = self._fetch_latest_ts_file()
-        self._save_video_to_temp_ts_file(video_bytes)  # type: ignore
+        latest_ts_file_bytes = self._fetch_latest_ts_file()
+        self._save_video_to_temp_ts_file(latest_ts_file_bytes)  # type: ignore
         frames = self._get_frames_from_temp_ts_file()
         self._remove_temp_ts_file()
 
