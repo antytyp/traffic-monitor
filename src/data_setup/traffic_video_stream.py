@@ -49,14 +49,15 @@ class TrafficVideoStream:
         return latest_ts_url
 
     def _fetch_latest_ts_file(self) -> Union[bytes, None]:
-        latest_ts_url = self._get_latest_ts_url()
+        try:
+            latest_ts_url = self._get_latest_ts_url()
+            response = requests.get(latest_ts_url)
+            response.raise_for_status()
 
-        response = requests.get(latest_ts_url)
-
-        if response.status_code != 200:
+            return response.content
+        except requests.RequestException as e:
+            logger.error(f"Error: Unable to fetch latest .ts file. Reason: {e}")
             return None
-
-        return response.content
 
     def _save_video_to_temp_ts_file(self, video_bytes: bytes) -> None:
         with open(self.TEMP_TS_PATH, "wb+") as f:
