@@ -19,7 +19,7 @@ class TrafficVideoStream:
         self.stream_url = stream_url
         self.base_url = self.stream_url.rstrip(self.stream_url.split("/")[-1])
 
-    def _fetch_video_bytes(self) -> Union[bytes, None]:
+    def _get_m3u8_url(self) -> Union[str, None]:
         response = requests.get(self.stream_url)
 
         if response.status_code != 200:
@@ -29,6 +29,11 @@ class TrafficVideoStream:
             key for key in response.text.split("\n") if key.endswith(".m3u8")
         ][0]
         m3u8_url = self.base_url + m3u8_url_suffix
+
+        return m3u8_url
+
+    def _fetch_video_bytes(self) -> Union[bytes, None]:
+        m3u8_url = self._get_m3u8_url()
 
         response = requests.get(m3u8_url)
 
