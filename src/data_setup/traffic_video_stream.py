@@ -10,10 +10,11 @@ logger = logging.getLogger(__name__)
 
 SOURCE_FPS = 25
 SOURCE_VIDEO_LENGTH_IN_SECONDS = 6
-TEMP_TS_PATH = "tmp/temp_traffic_monitor_video.ts"
 
 
 class TrafficVideoStream:
+    TEMP_TS_PATH = "tmp/temp_traffic_monitor_video.ts"
+
     def __init__(self, stream_url: str):
         self.stream_url = stream_url
         self.base_url = self.stream_url.rstrip(self.stream_url.split("/")[-1])
@@ -46,16 +47,18 @@ class TrafficVideoStream:
 
         return response.content
 
+    def _save_video_to_temp_ts_file(self, video_bytes: bytes) -> None:
+        with open(self.TEMP_TS_PATH, "wb+") as f:
+            f.write(video_bytes)
+
     def download_video_batch(self) -> List[np.ndarray]:
         frames: List[np.ndarray] = []
 
         video_bytes = self._fetch_video_bytes()
-
-        with open(TEMP_TS_PATH, "wb+") as f:
-            f.write(video_bytes)  # type: ignore
+        self._save_video_to_temp_ts_file(video_bytes)  # type: ignore
 
         cv2_video_capture = cv2.VideoCapture()
-        cv2_video_capture.open(TEMP_TS_PATH)
+        cv2_video_capture.open(self.TEMP_TS_PATH)
         number_of_frames = int(cv2_video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
 
         for _ in range(number_of_frames):
