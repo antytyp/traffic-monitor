@@ -42,6 +42,9 @@ def main() -> None:
     traffic_video_stream = TrafficVideoStream(stream_url=config.camera_stream_url)
     logger.info(f"TrafficVideoStream {traffic_video_stream} initialized.")
 
+    frames = traffic_video_stream.download_video_batch()
+    logger.info(f"Downloaded {len(frames)} frames.")
+
 
 if __name__ == "__main__":
     main()
