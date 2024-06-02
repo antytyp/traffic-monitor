@@ -51,11 +51,8 @@ class TrafficVideoStream:
         with open(self.TEMP_TS_PATH, "wb+") as f:
             f.write(video_bytes)
 
-    def download_video_batch(self) -> List[np.ndarray]:
+    def _get_frames_from_temp_ts_file(self) -> List[np.ndarray]:
         frames: List[np.ndarray] = []
-
-        video_bytes = self._fetch_video_bytes()
-        self._save_video_to_temp_ts_file(video_bytes)  # type: ignore
 
         cv2_video_capture = cv2.VideoCapture()
         cv2_video_capture.open(self.TEMP_TS_PATH)
@@ -66,5 +63,12 @@ class TrafficVideoStream:
             frames.append(frame)
 
         cv2_video_capture.release()
+
+        return frames
+
+    def download_video_batch(self) -> List[np.ndarray]:
+        video_bytes = self._fetch_video_bytes()
+        self._save_video_to_temp_ts_file(video_bytes)  # type: ignore
+        frames = self._get_frames_from_temp_ts_file()
 
         return frames
