@@ -1,4 +1,5 @@
 import logging
+from typing import Union, Set
 
 import requests  # type: ignore
 
@@ -11,6 +12,8 @@ class DataDownloader:
         self.stream_url = stream_url
         self.base_url = self._get_base_url()
         self.m3u8_url = self._get_m3u8_url()
+
+        self.downloaded_ts_files_log: Set[str] = set()
 
     def _get_base_url(self) -> str:
         base_url = self.stream_url.rstrip(self.stream_url.split("/")[-1])
@@ -26,3 +29,21 @@ class DataDownloader:
         m3u8_url = self.base_url + m3u8_url_suffix
         logger.info(f"Prepared m3u8 url: {m3u8_url}")
         return m3u8_url
+
+    def fetch_new_ts_file(self) -> Union[bytes, None]:
+        response = requests.get(self.m3u8_url)
+        ts_files = [key for key in response.text.split("\n") if key.endswith(".ts")]
+        ts_file_to_download = min(ts_files)
+
+        if ts_file_to_download not in self.downloaded_ts_files_log:
+            ts_file_url = self.base_url + ts_file_to_download
+            response = requests.get(ts_file_url)
+            logger.info(
+                f"Downloaded data from {ts_file_url} of size {len(response.content)}."
+            )
+            ts_file_content = response.content
+            self.downloaded_ts_files_log.add(ts_file_to_download)
+        else:
+            ts_file_content = None
+
+        return ts_file_content
