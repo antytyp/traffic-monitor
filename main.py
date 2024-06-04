@@ -12,7 +12,7 @@ from src.preprocessing.traffic_video_frame_preprocessor import (
     TrafficVideoFramePreprocessor,
 )
 from src.utils.utils import get_monitored_regions
-
+from src.data_setup.data_downloader import DataDownloader
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -37,6 +37,9 @@ def main() -> None:
         postprocessor=frame_postprocessor,
     )
     logger.info(f"InferencePipeline {inference_pipeline} initialized.")
+
+    data_downloader = DataDownloader(config.camera_stream_url)
+    _ = data_downloader.fetch_new_ts_file()
 
 
 if __name__ == "__main__":
