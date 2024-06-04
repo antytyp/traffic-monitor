@@ -11,7 +11,6 @@ from src.postprocessing.traffic_video_frame_postprocessor import (
 from src.preprocessing.traffic_video_frame_preprocessor import (
     TrafficVideoFramePreprocessor,
 )
-from src.data_setup.traffic_video_stream import TrafficVideoStream
 from src.utils.utils import get_monitored_regions
 
 
@@ -38,12 +37,6 @@ def main() -> None:
         postprocessor=frame_postprocessor,
     )
     logger.info(f"InferencePipeline {inference_pipeline} initialized.")
-
-    traffic_video_stream = TrafficVideoStream(stream_url=config.camera_stream_url)
-    logger.info(f"TrafficVideoStream {traffic_video_stream} initialized.")
-
-    frames = traffic_video_stream.download_video_batch()
-    logger.info(f"Downloaded {len(frames)} frames.")
 
 
 if __name__ == "__main__":
